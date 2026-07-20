@@ -1,0 +1,563 @@
+<!-- SentinelBrand — multi-page demo (Landing / Verify / Registry / Dashboard) -->
+<style>
+  #sb-root {
+    --ink: #0B1220;
+    --panel: #121B2E;
+    --panel-2: #17233A;
+    --line: #223049;
+    --text: #EDF1F7;
+    --muted: #8FA0B8;
+    --safe: #2BB673;
+    --safe-dim: #1B4A38;
+    --warn: #E8A33D;
+    --warn-dim: #4A3A1B;
+    --danger: #E85D4D;
+    --danger-dim: #4A231D;
+    --display-en: 'Space Grotesk', sans-serif;
+    --body-en: 'Inter', sans-serif;
+    --display-ar: 'IBM Plex Sans Arabic', sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+
+    background: var(--ink);
+    color: var(--text);
+    font-family: var(--body-en);
+    border-radius: 16px;
+    min-height: 720px;
+    position: relative;
+    overflow: hidden;
+  }
+  #sb-root * { box-sizing: border-box; }
+  #sb-root[dir="rtl"] { font-family: var(--display-ar); }
+  #sb-root[dir="rtl"] .sb-en { display: none; }
+  #sb-root[dir="ltr"] .sb-ar { display: none; }
+
+  #sb-root .sb-bg-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 42px 42px; opacity: 0.15; pointer-events: none;
+  }
+
+  /* ---- Nav ---- */
+  #sb-root .sb-navbar {
+    position: relative;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 28px;
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap; gap: 12px;
+  }
+  #sb-root .sb-brand { display: flex; align-items: center; gap: 9px; cursor: pointer; }
+  #sb-root .sb-brand-mark { width: 26px; height: 26px; flex-shrink: 0; }
+  #sb-root .sb-brand-name { font-family: var(--display-en); font-size: 16px; font-weight: 600; }
+  #sb-root[dir="rtl"] .sb-brand-name { font-family: var(--display-ar); font-weight: 500; }
+
+  #sb-root .sb-nav-links { display: flex; gap: 2px; background: var(--panel); border: 1px solid var(--line); border-radius: 100px; padding: 3px; }
+  #sb-root .sb-nav-btn {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.03em;
+    color: var(--muted); background: transparent; border: none; border-radius: 100px;
+    padding: 8px 15px; cursor: pointer; transition: all .15s ease;
+  }
+  #sb-root .sb-nav-btn.active { background: var(--panel-2); color: var(--text); }
+  #sb-root .sb-nav-btn:hover:not(.active) { color: var(--text); }
+
+  #sb-root .sb-lang-toggle { display: flex; border: 1px solid var(--line); border-radius: 100px; overflow: hidden; background: var(--panel); }
+  #sb-root .sb-lang-btn { border: none; background: transparent; color: var(--muted); font-family: var(--mono); font-size: 12px; letter-spacing: .05em; padding: 7px 13px; cursor: pointer; }
+  #sb-root .sb-lang-btn.active { background: var(--panel-2); color: var(--text); }
+
+  /* ---- Pages ---- */
+  #sb-root .sb-page { display: none; padding: 36px 28px 48px; position: relative; }
+  #sb-root .sb-page.active { display: block; animation: sbFadeUp .4s ease; }
+  @keyframes sbFadeUp { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+  #sb-root .sb-wrap { max-width: 760px; margin: 0 auto; }
+  #sb-root .sb-wrap-wide { max-width: 920px; margin: 0 auto; }
+
+  #sb-root .sb-hero-label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; color: var(--safe); text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  #sb-root .sb-hero-label::before { content:''; width:6px; height:6px; background: var(--safe); border-radius: 50%; box-shadow: 0 0 0 3px var(--safe-dim); }
+
+  #sb-root h1 { font-family: var(--display-en); font-size: 34px; line-height: 1.18; font-weight: 600; margin: 0 0 14px; letter-spacing: -0.01em; }
+  #sb-root[dir="rtl"] h1 { font-family: var(--display-ar); font-size: 31px; }
+  #sb-root h2 { font-family: var(--display-en); font-size: 22px; font-weight: 600; margin: 0 0 6px; }
+  #sb-root[dir="rtl"] h2 { font-family: var(--display-ar); }
+
+  #sb-root .sb-sub { color: var(--muted); font-size: 15px; line-height: 1.6; margin-bottom: 26px; max-width: 56ch; }
+
+  #sb-root .sb-cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 44px; }
+  #sb-root .sb-btn-primary, #sb-root .sb-btn-secondary {
+    font-family: var(--display-en); font-size: 14px; font-weight: 600; border-radius: 9px; padding: 12px 20px; cursor: pointer; border: none; transition: opacity .15s ease;
+  }
+  #sb-root[dir="rtl"] .sb-btn-primary, #sb-root[dir="rtl"] .sb-btn-secondary { font-family: var(--display-ar); }
+  #sb-root .sb-btn-primary { background: var(--safe); color: var(--ink); }
+  #sb-root .sb-btn-secondary { background: var(--panel); color: var(--text); border: 1px solid var(--line); }
+  #sb-root .sb-btn-primary:hover, #sb-root .sb-btn-secondary:hover { opacity: .88; }
+
+  /* stat strip */
+  #sb-root .sb-stat-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin-bottom: 44px; }
+  #sb-root .sb-stat-cell { background: var(--panel); padding: 20px 18px; }
+  #sb-root .sb-stat-num { font-family: var(--mono); font-size: 24px; color: var(--safe); margin-bottom: 4px; }
+  #sb-root .sb-stat-label { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+
+  /* feature grid */
+  #sb-root .sb-feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  #sb-root .sb-feature-card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+  #sb-root .sb-feature-icon { width: 30px; height: 30px; margin-bottom: 14px; }
+  #sb-root .sb-feature-title { font-family: var(--display-en); font-size: 14.5px; font-weight: 600; margin-bottom: 6px; }
+  #sb-root[dir="rtl"] .sb-feature-title { font-family: var(--display-ar); }
+  #sb-root .sb-feature-desc { font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+
+  /* ---- Verify page (reused component) ---- */
+  #sb-root .sb-input-panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 4px; }
+  #sb-root textarea { width: 100%; min-height: 120px; background: transparent; border: none; color: var(--text); font-family: var(--body-en); font-size: 15px; line-height: 1.6; padding: 16px 16px 8px; resize: vertical; outline: none; }
+  #sb-root[dir="rtl"] textarea { font-family: var(--display-ar); text-align: right; }
+  #sb-root textarea::placeholder { color: #4E5C74; }
+  #sb-root .sb-input-footer { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 10px; gap: 10px; flex-wrap: wrap; }
+  #sb-root .sb-examples { display: flex; gap: 6px; flex-wrap: wrap; }
+  #sb-root .sb-chip { font-family: var(--mono); font-size: 11px; color: var(--muted); background: var(--panel-2); border: 1px solid var(--line); border-radius: 100px; padding: 5px 11px; cursor: pointer; white-space: nowrap; }
+  #sb-root[dir="rtl"] .sb-chip { font-family: var(--display-ar); }
+  #sb-root .sb-chip:hover { border-color: var(--muted); color: var(--text); }
+  #sb-root .sb-check-btn { font-family: var(--display-en); font-size: 14px; font-weight: 600; color: var(--ink); background: var(--safe); border: none; border-radius: 9px; padding: 11px 20px; cursor: pointer; white-space: nowrap; }
+  #sb-root[dir="rtl"] .sb-check-btn { font-family: var(--display-ar); }
+  #sb-root .sb-check-btn:disabled { opacity: .5; cursor: wait; }
+  #sb-root .sb-result { margin-top: 24px; display: none; }
+  #sb-root .sb-result.show { display: block; animation: sbFadeUp .5s ease; }
+  #sb-root .sb-verdict-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: flex; gap: 18px; align-items: flex-start; }
+  #sb-root[dir="rtl"] .sb-verdict-card { flex-direction: row-reverse; text-align: right; }
+  #sb-root .sb-seal { flex-shrink: 0; width: 70px; height: 70px; }
+  #sb-root .sb-seal svg { width: 100%; height: 100%; animation: sbStamp .5s cubic-bezier(.2,1.4,.4,1); }
+  @keyframes sbStamp { 0%{transform:scale(1.6) rotate(-14deg); opacity:0;} 60%{transform:scale(.95) rotate(2deg); opacity:1;} 100%{transform:scale(1) rotate(0);} }
+  #sb-root .sb-verdict-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+  #sb-root[dir="rtl"] .sb-verdict-top { flex-direction: row-reverse; }
+  #sb-root .sb-verdict-label { font-family: var(--display-en); font-size: 21px; font-weight: 600; }
+  #sb-root[dir="rtl"] .sb-verdict-label { font-family: var(--display-ar); }
+  #sb-root .sb-verdict-score { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+  #sb-root .sb-verdict-score b { font-size: 14px; }
+  #sb-root .sb-verdict-summary { font-size: 14px; line-height: 1.6; margin: 12px 0 14px; opacity: .92; }
+  #sb-root .sb-reasons { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 7px; }
+  #sb-root .sb-reasons li { font-size: 13px; line-height: 1.5; color: var(--muted); padding-inline-start: 15px; position: relative; }
+  #sb-root .sb-reasons li::before { content:''; position:absolute; inset-inline-start:0; top:7px; width:5px; height:5px; background: var(--muted); border-radius:50%; }
+  #sb-root .sb-gauge-track { margin-top: 14px; height: 6px; border-radius: 100px; background: var(--panel-2); overflow: hidden; }
+  #sb-root .sb-gauge-fill { height: 100%; border-radius: 100px; width: 0%; transition: width .7s cubic-bezier(.3,.9,.4,1) .15s; }
+  #sb-root .sb-error { margin-top: 14px; color: var(--danger); font-size: 13px; display: none; }
+  #sb-root .sb-error.show { display: block; }
+
+  /* ---- Registry page ---- */
+  #sb-root .sb-search-row { display: flex; gap: 10px; margin-bottom: 20px; }
+  #sb-root .sb-search-input { flex: 1; background: var(--panel); border: 1px solid var(--line); border-radius: 9px; padding: 11px 14px; color: var(--text); font-size: 14px; outline: none; }
+  #sb-root .sb-search-input::placeholder { color: #4E5C74; }
+  #sb-root .sb-reg-table { width: 100%; border-collapse: collapse; }
+  #sb-root .sb-reg-table th { text-align: left; font-family: var(--mono); font-size: 11px; letter-spacing: .05em; color: var(--muted); text-transform: uppercase; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  #sb-root[dir="rtl"] .sb-reg-table th { text-align: right; }
+  #sb-root .sb-reg-table td { padding: 14px 14px; border-bottom: 1px solid var(--line); font-size: 13.5px; vertical-align: middle; }
+  #sb-root .sb-org-name { font-weight: 600; }
+  #sb-root .sb-badge-verified { display: inline-flex; align-items: center; gap: 5px; background: var(--safe-dim); color: var(--safe); font-family: var(--mono); font-size: 11px; padding: 4px 9px; border-radius: 100px; }
+  #sb-root .sb-badge-verified::before { content:''; width:5px; height:5px; background: var(--safe); border-radius: 50%; }
+  #sb-root .sb-muted-cell { color: var(--muted); font-family: var(--mono); font-size: 12.5px; }
+
+  /* ---- Dashboard page ---- */
+  #sb-root .sb-dash-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 26px; }
+  #sb-root .sb-dash-stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  #sb-root .sb-dash-stat-label { font-size: 11.5px; color: var(--muted); margin-bottom: 8px; }
+  #sb-root .sb-dash-stat-num { font-family: var(--mono); font-size: 22px; }
+  #sb-root .sb-dash-stat-num.warn { color: var(--warn); }
+  #sb-root .sb-dash-stat-num.safe { color: var(--safe); }
+  #sb-root .sb-dash-stat-num.danger { color: var(--danger); }
+
+  #sb-root .sb-chart-panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+  #sb-root .sb-chart-title { font-size: 12.5px; color: var(--muted); margin-bottom: 14px; font-family: var(--mono); text-transform: uppercase; letter-spacing: .05em; }
+  #sb-root .sb-bars { display: flex; align-items: flex-end; gap: 8px; height: 90px; }
+  #sb-root .sb-bar { flex: 1; background: var(--safe); border-radius: 4px 4px 0 0; opacity: .85; position: relative; }
+  #sb-root .sb-bar:hover { opacity: 1; }
+  #sb-root .sb-bar-labels { display: flex; gap: 8px; margin-top: 8px; }
+  #sb-root .sb-bar-labels span { flex: 1; text-align: center; font-size: 10.5px; color: var(--muted); font-family: var(--mono); }
+
+  #sb-root .sb-det-table { width: 100%; border-collapse: collapse; margin-bottom: 26px; }
+  #sb-root .sb-det-table th { text-align: left; font-family: var(--mono); font-size: 11px; letter-spacing: .05em; color: var(--muted); text-transform: uppercase; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  #sb-root[dir="rtl"] .sb-det-table th { text-align: right; }
+  #sb-root .sb-det-table td { padding: 12px; border-bottom: 1px solid var(--line); font-size: 13px; }
+  #sb-root .sb-risk-pill { font-family: var(--mono); font-size: 11px; padding: 3px 9px; border-radius: 100px; display: inline-block; }
+  #sb-root .sb-risk-high { background: var(--danger-dim); color: var(--danger); }
+  #sb-root .sb-risk-med { background: var(--warn-dim); color: var(--warn); }
+  #sb-root .sb-risk-low { background: var(--safe-dim); color: var(--safe); }
+  #sb-root .sb-status-pill { font-size: 11.5px; color: var(--muted); }
+
+  #sb-root .sb-assets-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  #sb-root .sb-asset-chip { background: var(--panel); border: 1px solid var(--line); border-radius: 9px; padding: 10px 14px; font-size: 12.5px; display: flex; align-items: center; gap: 8px; }
+  #sb-root .sb-asset-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--safe); }
+
+  #sb-root .sb-disclaimer { margin-top: 34px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11.5px; line-height: 1.6; }
+
+  @media (max-width: 640px) {
+    #sb-root .sb-navbar { padding: 14px 16px; }
+    #sb-root .sb-nav-links { order: 3; width: 100%; justify-content: space-between; }
+    #sb-root .sb-page { padding: 26px 16px 36px; }
+    #sb-root h1 { font-size: 26px; }
+    #sb-root .sb-feature-grid, #sb-root .sb-stat-strip, #sb-root .sb-dash-stats { grid-template-columns: 1fr; }
+    #sb-root .sb-verdict-card { flex-direction: column !important; }
+    #sb-root .sb-reg-table, #sb-root .sb-det-table { display: block; overflow-x: auto; white-space: nowrap; }
+  }
+</style>
+
+<div id="sb-root" dir="ltr">
+  <div class="sb-bg-grid"></div>
+
+  <div class="sb-navbar">
+    <div class="sb-brand" data-nav="landing">
+      <svg class="sb-brand-mark" viewBox="0 0 32 32" fill="none">
+        <path d="M16 2L28 7V15C28 22.5 22.8 28.5 16 30C9.2 28.5 4 22.5 4 15V7L16 2Z" stroke="#2BB673" stroke-width="2" fill="#132A22"/>
+        <path d="M11 16L14.5 19.5L21.5 12" stroke="#2BB673" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="sb-brand-name">SentinelBrand</span>
+    </div>
+    <div class="sb-nav-links">
+      <button class="sb-nav-btn active" data-nav="landing"><span class="sb-en">Home</span><span class="sb-ar">الرئيسية</span></button>
+      <button class="sb-nav-btn" data-nav="verify"><span class="sb-en">Verify</span><span class="sb-ar">تحقق</span></button>
+      <button class="sb-nav-btn" data-nav="registry"><span class="sb-en">Registry</span><span class="sb-ar">السجل</span></button>
+      <button class="sb-nav-btn" data-nav="dashboard"><span class="sb-en">Dashboard</span><span class="sb-ar">لوحة التحكم</span></button>
+    </div>
+    <div class="sb-lang-toggle">
+      <button class="sb-lang-btn active" data-lang="en">EN</button>
+      <button class="sb-lang-btn" data-lang="ar">عربي</button>
+    </div>
+  </div>
+
+  <!-- ===== LANDING ===== -->
+  <div class="sb-page active" data-page="landing">
+    <div class="sb-wrap">
+      <div class="sb-hero-label sb-en">Brand &amp; impersonation protection · Saudi &amp; GCC</div>
+      <div class="sb-hero-label sb-ar">حماية العلامة التجارية من الانتحال · السعودية والخليج</div>
+      <h1 class="sb-en">Make impersonation the hardest scam to pull off.</h1>
+      <h1 class="sb-ar">اجعل الانتحال أصعب عملية احتيال يمكن تنفيذها.</h1>
+      <p class="sb-sub sb-en">SentinelBrand watches for cloned apps, look-alike domains, and fake social accounts impersonating your organization — and gives every citizen a free, instant, bilingual way to check "is this real?" before they lose money or data.</p>
+      <p class="sb-sub sb-ar">تراقب SentinelBrand التطبيقات المستنسخة والنطاقات المزيفة والحسابات الاجتماعية الوهمية التي تنتحل جهتك — وتمنح كل مواطن أداة مجانية وفورية بلغتين للتحقق قبل أن يخسر ماله أو بياناته.</p>
+
+      <div class="sb-cta-row">
+        <button class="sb-btn-primary" data-nav="verify"><span class="sb-en">Try the Verify tool</span><span class="sb-ar">جرّب أداة التحقق</span></button>
+        <button class="sb-btn-secondary" data-nav="dashboard"><span class="sb-en">View organization dashboard</span><span class="sb-ar">عرض لوحة الجهة</span></button>
+      </div>
+
+      <div class="sb-stat-strip">
+        <div class="sb-stat-cell"><div class="sb-stat-num">~300%</div><div class="sb-stat-label sb-en">Rise in AI-powered scams targeting KSA consumers, 2025</div><div class="sb-stat-label sb-ar">ارتفاع الاحتيال المعتمد على الذكاء الاصطناعي في السعودية، 2025</div></div>
+        <div class="sb-stat-cell"><div class="sb-stat-num">3+</div><div class="sb-stat-label sb-en">Channels scanned: domains, app stores, social search</div><div class="sb-stat-label sb-ar">قنوات المسح: النطاقات، متاجر التطبيقات، الشبكات الاجتماعية</div></div>
+        <div class="sb-stat-cell"><div class="sb-stat-num">100%</div><div class="sb-stat-label sb-en">Free for individual citizens, always</div><div class="sb-stat-label sb-ar">مجاني للمواطنين الأفراد دائماً</div></div>
+      </div>
+
+      <div class="sb-feature-grid">
+        <div class="sb-feature-card">
+          <svg class="sb-feature-icon" viewBox="0 0 30 30" fill="none"><circle cx="15" cy="15" r="12" stroke="#2BB673" stroke-width="2"/><path d="M15 9v6l4 3" stroke="#2BB673" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="sb-feature-title sb-en">Continuous monitoring</div>
+          <div class="sb-feature-title sb-ar">مراقبة مستمرة</div>
+          <div class="sb-feature-desc sb-en">Organizations register brand assets once; scans run on a schedule and score every detection by risk.</div>
+          <div class="sb-feature-desc sb-ar">تسجّل الجهة أصولها مرة واحدة، وتعمل عمليات المسح دورياً مع تقييم كل حالة اكتشاف حسب الخطورة.</div>
+        </div>
+        <div class="sb-feature-card">
+          <svg class="sb-feature-icon" viewBox="0 0 30 30" fill="none"><path d="M15 4l10 4v6c0 6-4.5 10-10 12-5.5-2-10-6-10-12V8l10-4z" stroke="#2BB673" stroke-width="2"/></svg>
+          <div class="sb-feature-title sb-en">Free public verification</div>
+          <div class="sb-feature-title sb-ar">تحقق عام مجاني</div>
+          <div class="sb-feature-desc sb-en">Anyone can paste a message or link and get an explained safe/suspicious/scam verdict in seconds.</div>
+          <div class="sb-feature-desc sb-ar">يمكن لأي شخص لصق رسالة أو رابط والحصول على حكم مشروح خلال ثوانٍ.</div>
+        </div>
+        <div class="sb-feature-card">
+          <svg class="sb-feature-icon" viewBox="0 0 30 30" fill="none"><path d="M6 15h18M6 9h18M6 21h12" stroke="#2BB673" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="sb-feature-title sb-en">Arabic-first by default</div>
+          <div class="sb-feature-title sb-ar">عربي أولاً بشكل افتراضي</div>
+          <div class="sb-feature-desc sb-en">Built for Gulf dialect scam patterns, not translated as an afterthought.</div>
+          <div class="sb-feature-desc sb-ar">مبني لفهم أنماط الاحتيال باللهجة الخليجية، وليس ترجمة لاحقة.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== VERIFY ===== -->
+  <div class="sb-page" data-page="verify">
+    <div class="sb-wrap">
+      <div class="sb-hero-label sb-en">Bilingual scam &amp; impersonation check</div>
+      <div class="sb-hero-label sb-ar">فحص بلغتين للاحتيال والانتحال</div>
+      <h1 class="sb-en">Paste a message. Get a straight answer.</h1>
+      <h1 class="sb-ar">الصق الرسالة. احصل على إجابة واضحة.</h1>
+      <p class="sb-sub sb-en">Drop in a suspicious SMS, WhatsApp message, job offer, or link. No account, no data stored.</p>
+      <p class="sb-sub sb-ar">ألصق رسالة نصية أو رسالة واتساب أو عرض وظيفة أو رابطًا مشبوهًا. بدون حساب، وبدون حفظ بياناتك.</p>
+
+      <div class="sb-input-panel">
+        <textarea id="sb-input" class="sb-en" placeholder="Paste the message or link here…"></textarea>
+        <textarea id="sb-input-ar" class="sb-ar" placeholder="الصق الرسالة أو الرابط هنا…"></textarea>
+        <div class="sb-input-footer">
+          <div class="sb-examples">
+            <span class="sb-chip sb-en" data-example="job">Job offer</span>
+            <span class="sb-chip sb-en" data-example="sms">Bank SMS</span>
+            <span class="sb-chip sb-en" data-example="link">Suspicious link</span>
+            <span class="sb-chip sb-ar" data-example="job">عرض وظيفة</span>
+            <span class="sb-chip sb-ar" data-example="sms">رسالة بنكية</span>
+            <span class="sb-chip sb-ar" data-example="link">رابط مشبوه</span>
+          </div>
+          <button id="sb-check-btn" class="sb-check-btn"><span class="sb-en">Check now</span><span class="sb-ar">تحقق الآن</span></button>
+        </div>
+      </div>
+
+      <div id="sb-error" class="sb-error">
+        <span class="sb-en">Something went wrong reaching the checker. Try again in a moment.</span>
+        <span class="sb-ar">حدث خطأ أثناء الفحص. حاول مرة أخرى بعد لحظات.</span>
+      </div>
+
+      <div id="sb-result" class="sb-result">
+        <div class="sb-verdict-card">
+          <div class="sb-seal" id="sb-seal"></div>
+          <div style="flex:1; min-width:0;">
+            <div class="sb-verdict-top">
+              <div class="sb-verdict-label" id="sb-verdict-label">—</div>
+              <div class="sb-verdict-score"><span class="sb-en">Risk score </span><span class="sb-ar">درجة الخطورة </span><b id="sb-score-num">0</b>/100</div>
+            </div>
+            <div class="sb-gauge-track"><div class="sb-gauge-fill" id="sb-gauge-fill"></div></div>
+            <div class="sb-verdict-summary" id="sb-summary"></div>
+            <ul class="sb-reasons" id="sb-reasons"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="sb-disclaimer sb-en">Verdicts are generated by an AI model for demonstration purposes and are not a substitute for official verification.</div>
+      <div class="sb-disclaimer sb-ar">الأحكام يولّدها نموذج ذكاء اصطناعي لأغراض العرض فقط، ولا تُغني عن التحقق الرسمي.</div>
+    </div>
+  </div>
+
+  <!-- ===== REGISTRY ===== -->
+  <div class="sb-page" data-page="registry">
+    <div class="sb-wrap-wide">
+      <div class="sb-hero-label sb-en">Verified organization registry</div>
+      <div class="sb-hero-label sb-ar">سجل الجهات الموثّقة</div>
+      <h1 class="sb-en">Who's really who.</h1>
+      <h1 class="sb-ar">من هو الجهة الحقيقية.</h1>
+      <p class="sb-sub sb-en">Organizations verified via DNS TXT record or domain-email proof. This is the trust layer the Verify tool checks against.</p>
+      <p class="sb-sub sb-ar">جهات تم توثيقها عبر سجل DNS TXT أو إثبات بريد النطاق. هذه هي طبقة الثقة التي تعتمد عليها أداة التحقق.</p>
+
+      <div class="sb-search-row">
+        <input id="sb-reg-search" class="sb-search-input sb-en" placeholder="Search organizations…">
+        <input id="sb-reg-search-ar" class="sb-search-input sb-ar" placeholder="ابحث عن جهة…">
+      </div>
+
+      <table class="sb-reg-table">
+        <thead><tr>
+          <th class="sb-en">Organization</th><th class="sb-ar">الجهة</th>
+          <th class="sb-en">Sector</th><th class="sb-ar">القطاع</th>
+          <th class="sb-en">Domain</th><th class="sb-ar">النطاق</th>
+          <th class="sb-en">Status</th><th class="sb-ar">الحالة</th>
+        </tr></thead>
+        <tbody id="sb-reg-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== DASHBOARD ===== -->
+  <div class="sb-page" data-page="dashboard">
+    <div class="sb-wrap-wide">
+      <div class="sb-hero-label sb-en">Organization dashboard · demo tenant</div>
+      <div class="sb-hero-label sb-ar">لوحة تحكم الجهة · حساب تجريبي</div>
+      <h1 class="sb-en">Bank Alpha KSA</h1>
+      <h1 class="sb-ar">بنك ألفا السعودية</h1>
+      <p class="sb-sub sb-en">Live view of impersonation detections across monitored channels.</p>
+      <p class="sb-sub sb-ar">عرض مباشر لحالات الانتحال المكتشفة عبر القنوات المراقَبة.</p>
+
+      <div class="sb-dash-stats">
+        <div class="sb-dash-stat"><div class="sb-dash-stat-label sb-en">Total detections</div><div class="sb-dash-stat-label sb-ar">إجمالي الاكتشافات</div><div class="sb-dash-stat-num">47</div></div>
+        <div class="sb-dash-stat"><div class="sb-dash-stat-label sb-en">Open threats</div><div class="sb-dash-stat-label sb-ar">تهديدات مفتوحة</div><div class="sb-dash-stat-num danger">9</div></div>
+        <div class="sb-dash-stat"><div class="sb-dash-stat-label sb-en">Resolved this month</div><div class="sb-dash-stat-label sb-ar">تم حلها هذا الشهر</div><div class="sb-dash-stat-num safe">14</div></div>
+        <div class="sb-dash-stat"><div class="sb-dash-stat-label sb-en">Avg. resolution time</div><div class="sb-dash-stat-label sb-ar">متوسط وقت الحل</div><div class="sb-dash-stat-num warn">3.2d</div></div>
+      </div>
+
+      <div class="sb-chart-panel">
+        <div class="sb-chart-title sb-en">Detections — last 8 weeks</div>
+        <div class="sb-chart-title sb-ar">الاكتشافات — آخر 8 أسابيع</div>
+        <div class="sb-bars" id="sb-bars"></div>
+        <div class="sb-bar-labels"><span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span></div>
+      </div>
+
+      <h2 class="sb-en" style="font-size:16px; margin-bottom:14px;">Recent detections</h2>
+      <h2 class="sb-ar" style="font-size:16px; margin-bottom:14px;">أحدث الاكتشافات</h2>
+      <table class="sb-det-table">
+        <thead><tr>
+          <th class="sb-en">Asset</th><th class="sb-ar">الأصل</th>
+          <th class="sb-en">Channel</th><th class="sb-ar">القناة</th>
+          <th class="sb-en">Risk</th><th class="sb-ar">الخطورة</th>
+          <th class="sb-en">Status</th><th class="sb-ar">الحالة</th>
+          <th class="sb-en">Date</th><th class="sb-ar">التاريخ</th>
+        </tr></thead>
+        <tbody id="sb-det-body"></tbody>
+      </table>
+
+      <h2 class="sb-en" style="font-size:16px; margin-bottom:12px;">Monitored brand assets</h2>
+      <h2 class="sb-ar" style="font-size:16px; margin-bottom:12px;">الأصول المراقَبة</h2>
+      <div class="sb-assets-row">
+        <div class="sb-asset-chip"><span class="sb-asset-dot"></span>bankalpha.sa</div>
+        <div class="sb-asset-chip"><span class="sb-asset-dot"></span>Bank Alpha — App Store</div>
+        <div class="sb-asset-chip"><span class="sb-asset-dot"></span>Bank Alpha — Google Play</div>
+        <div class="sb-asset-chip"><span class="sb-asset-dot"></span>@BankAlphaKSA — X</div>
+        <div class="sb-asset-chip"><span class="sb-asset-dot"></span>Logo mark v3</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  const root = document.getElementById('sb-root');
+  let currentLang = 'en';
+
+  // ---- nav + lang wiring ----
+  function setPage(name) {
+    root.querySelectorAll('.sb-page').forEach(p => p.classList.toggle('active', p.dataset.page === name));
+    root.querySelectorAll('.sb-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.nav === name));
+  }
+  root.querySelectorAll('[data-nav]').forEach(el => {
+    el.addEventListener('click', () => setPage(el.dataset.nav));
+  });
+  root.querySelectorAll('.sb-lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      root.querySelectorAll('.sb-lang-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentLang = btn.dataset.lang;
+      root.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+    });
+  });
+
+  // ---- Verify tool ----
+  const inputEn = document.getElementById('sb-input');
+  const inputAr = document.getElementById('sb-input-ar');
+  const checkBtn = document.getElementById('sb-check-btn');
+  const resultEl = document.getElementById('sb-result');
+  const errorEl = document.getElementById('sb-error');
+  const sealEl = document.getElementById('sb-seal');
+  const verdictLabel = document.getElementById('sb-verdict-label');
+  const scoreNum = document.getElementById('sb-score-num');
+  const gaugeFill = document.getElementById('sb-gauge-fill');
+  const summaryEl = document.getElementById('sb-summary');
+  const reasonsEl = document.getElementById('sb-reasons');
+
+  const examples = {
+    job: { en: "URGENT HIRING - Saudi Aramco is hiring remote data entry staff, no experience needed, earn 8000 SAR/week. Reply with your full name, ID number, and IBAN to secure your position today. Limited slots!",
+           ar: "توظيف عاجل - شركة أرامكو السعودية توظف موظفين لإدخال البيانات عن بعد، بدون خبرة، الراتب 8000 ريال أسبوعياً. أرسل اسمك الكامل ورقم الهوية والآيبان لتأكيد وظيفتك اليوم. الأماكن محدودة!" },
+    sms: { en: "Alrajhi Bank: Your account has been temporarily suspended due to unusual activity. Verify now to avoid closure: alrajhi-secure-verify.com/login",
+           ar: "بنك الراجحي: تم إيقاف حسابك مؤقتاً بسبب نشاط غير معتاد. تحقق الآن لتجنب الإغلاق: alrajhi-secure-verify.com/login" },
+    link: { en: "Check your Absher status update here: absher-gov-sa.info/status?id=48291",
+            ar: "تحقق من تحديث حالتك في أبشر هنا: absher-gov-sa.info/status?id=48291" }
+  };
+
+  root.querySelectorAll('.sb-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const key = chip.dataset.example;
+      inputEn.value = examples[key].en;
+      inputAr.value = examples[key].ar;
+    });
+  });
+
+  function sealSvg(verdict) {
+    const colors = { safe:{ring:'#2BB673',fill:'#1B4A38'}, suspicious:{ring:'#E8A33D',fill:'#4A3A1B'}, scam:{ring:'#E85D4D',fill:'#4A231D'} };
+    const c = colors[verdict] || colors.suspicious;
+    const icon = verdict === 'safe'
+      ? '<path d="M23 38L31 46L49 28" stroke="'+c.ring+'" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>'
+      : verdict === 'scam'
+      ? '<path d="M28 26L44 46M44 26L28 46" stroke="'+c.ring+'" stroke-width="4.5" stroke-linecap="round"/>'
+      : '<path d="M36 24V38" stroke="'+c.ring+'" stroke-width="4.5" stroke-linecap="round"/><circle cx="36" cy="46" r="2.6" fill="'+c.ring+'"/>';
+    return '<svg viewBox="0 0 72 72" fill="none"><circle cx="36" cy="36" r="33" fill="'+c.fill+'" stroke="'+c.ring+'" stroke-width="2.5"/><circle cx="36" cy="36" r="27" stroke="'+c.ring+'" stroke-width="1" stroke-dasharray="2 3" opacity="0.6"/>'+icon+'</svg>';
+  }
+  const verdictText = { safe:{en:'Looks safe',ar:'يبدو آمناً'}, suspicious:{en:'Suspicious',ar:'مشبوه'}, scam:{en:'Likely scam',ar:'احتيال على الأرجح'} };
+  const gaugeColor = { safe:'#2BB673', suspicious:'#E8A33D', scam:'#E85D4D' };
+
+  async function checkMessage() {
+    const text = (currentLang === 'ar' ? inputAr.value : inputEn.value).trim();
+    if (!text) return;
+    checkBtn.disabled = true;
+    errorEl.classList.remove('show');
+    resultEl.classList.remove('show');
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 700,
+          system: "You are a bilingual (Arabic/English) scam and impersonation detection classifier for Saudi Arabia and the GCC, built for a product called SentinelBrand. Given a pasted message, SMS, job offer, or link, assess how likely it is to be a scam, phishing attempt, or impersonation of a real brand/government service (e.g. fake Absher, fake bank, fake job offer, look-alike domains, requests for ID/IBAN/OTP, urgency pressure tactics, unrealistic pay, etc). Respond with ONLY a raw JSON object, no markdown fences, no preamble, in exactly this shape: {\"verdict\": \"safe\" | \"suspicious\" | \"scam\", \"risk_score\": <integer 0-100>, \"summary_en\": \"<one plain sentence, English>\", \"summary_ar\": \"<one plain sentence, Modern Standard Arabic>\", \"reasons_en\": [\"<short reason>\", \"<short reason>\", \"<short reason>\"], \"reasons_ar\": [\"<short reason in Arabic>\", \"<short reason in Arabic>\", \"<short reason in Arabic>\"]}. Give 2-4 reasons. Be concrete and reference specific red flags in the text (or their absence, for safe verdicts). Keep summaries under 25 words.",
+          messages: [{ role: "user", content: text }]
+        })
+      });
+      const data = await response.json();
+      let raw = data.content.map(b => b.text || "").join("").trim();
+      raw = raw.replace(/```json|```/g, "").trim();
+      renderResult(JSON.parse(raw));
+    } catch (err) {
+      console.error(err);
+      errorEl.classList.add('show');
+    } finally {
+      checkBtn.disabled = false;
+    }
+  }
+
+  function renderResult(r) {
+    const v = ['safe','suspicious','scam'].includes(r.verdict) ? r.verdict : 'suspicious';
+    sealEl.innerHTML = sealSvg(v);
+    verdictLabel.textContent = verdictText[v][currentLang];
+    verdictLabel.style.color = gaugeColor[v];
+    scoreNum.textContent = r.risk_score;
+    gaugeFill.style.background = gaugeColor[v];
+    summaryEl.textContent = currentLang === 'ar' ? r.summary_ar : r.summary_en;
+    reasonsEl.innerHTML = '';
+    (currentLang === 'ar' ? r.reasons_ar : r.reasons_en || []).forEach(reason => {
+      const li = document.createElement('li'); li.textContent = reason; reasonsEl.appendChild(li);
+    });
+    resultEl.classList.add('show');
+    requestAnimationFrame(() => { gaugeFill.style.width = r.risk_score + '%'; });
+  }
+  checkBtn.addEventListener('click', checkMessage);
+
+  // ---- Registry data ----
+  const registryData = [
+    { en:"Bank Alpha KSA", ar:"بنك ألفا السعودية", sector_en:"Banking", sector_ar:"مصرفية", domain:"bankalpha.sa" },
+    { en:"Al Rajhi Bank", ar:"مصرف الراجحي", sector_en:"Banking", sector_ar:"مصرفية", domain:"alrajhibank.com.sa" },
+    { en:"Absher (Ministry of Interior)", ar:"أبشر (وزارة الداخلية)", sector_en:"Government", sector_ar:"حكومي", domain:"absher.sa" },
+    { en:"STC — Saudi Telecom", ar:"شركة الاتصالات السعودية", sector_en:"Telecom", sector_ar:"اتصالات", domain:"stc.com.sa" },
+    { en:"Tawakkalna", ar:"توكلنا", sector_en:"Government", sector_ar:"حكومي", domain:"tawakkalna.gov.sa" },
+    { en:"Jahez Delivery", ar:"جاهز", sector_en:"E-commerce", sector_ar:"تجارة إلكترونية", domain:"jahez.net" }
+  ];
+  const regBody = document.getElementById('sb-reg-body');
+  function renderRegistry(filter) {
+    const f = (filter || '').toLowerCase();
+    regBody.innerHTML = registryData
+      .filter(o => o.en.toLowerCase().includes(f) || o.ar.includes(filter || ''))
+      .map(o => `<tr>
+        <td class="sb-org-name">${currentLang==='ar' ? o.ar : o.en}</td>
+        <td>${currentLang==='ar' ? o.sector_ar : o.sector_en}</td>
+        <td class="sb-muted-cell">${o.domain}</td>
+        <td><span class="sb-badge-verified">${currentLang==='ar' ? 'موثّق' : 'Verified'}</span></td>
+      </tr>`).join('');
+  }
+  document.getElementById('sb-reg-search').addEventListener('input', e => renderRegistry(e.target.value));
+  document.getElementById('sb-reg-search-ar').addEventListener('input', e => renderRegistry(e.target.value));
+  renderRegistry('');
+  root.querySelectorAll('.sb-lang-btn').forEach(b => b.addEventListener('click', () => renderRegistry('')));
+
+  // ---- Dashboard: bars ----
+  const barsEl = document.getElementById('sb-bars');
+  const weekVals = [4, 7, 5, 9, 6, 11, 8, 12];
+  const maxVal = Math.max(...weekVals);
+  barsEl.innerHTML = weekVals.map(v => `<div class="sb-bar" style="height:${(v/maxVal*100).toFixed(0)}%" title="${v} detections"></div>`).join('');
+
+  // ---- Dashboard: detections table ----
+  const detections = [
+    { asset:"bankalpha-secure.com", channel_en:"Domain", channel_ar:"نطاق", risk:92, status_en:"New", status_ar:"جديد", date:"Jul 18" },
+    { asset:"Bank Alpha Mobile (clone)", channel_en:"App Store", channel_ar:"متجر تطبيقات", risk:88, status_en:"Confirmed", status_ar:"مؤكد", date:"Jul 17" },
+    { asset:"@BankAlpha_Support", channel_en:"Social", channel_ar:"شبكات اجتماعية", risk:64, status_en:"Reviewing", status_ar:"قيد المراجعة", date:"Jul 15" },
+    { asset:"bank-alpha-ksa.info", channel_en:"Domain", channel_ar:"نطاق", risk:71, status_en:"Reviewing", status_ar:"قيد المراجعة", date:"Jul 14" },
+    { asset:"Bank Alpha Rewards (clone)", channel_en:"App Store", channel_ar:"متجر تطبيقات", risk:39, status_en:"Dismissed", status_ar:"مرفوض", date:"Jul 10" },
+    { asset:"bankalpha-support.net", channel_en:"Domain", channel_ar:"نطاق", risk:22, status_en:"Resolved", status_ar:"تم الحل", date:"Jul 6" }
+  ];
+  function riskClass(r) { return r >= 70 ? 'sb-risk-high' : r >= 40 ? 'sb-risk-med' : 'sb-risk-low'; }
+  const detBody = document.getElementById('sb-det-body');
+  function renderDetections() {
+    detBody.innerHTML = detections.map(d => `<tr>
+      <td>${d.asset}</td>
+      <td>${currentLang==='ar' ? d.channel_ar : d.channel_en}</td>
+      <td><span class="sb-risk-pill ${riskClass(d.risk)}">${d.risk}</span></td>
+      <td><span class="sb-status-pill">${currentLang==='ar' ? d.status_ar : d.status_en}</span></td>
+      <td class="sb-muted-cell">${d.date}</td>
+    </tr>`).join('');
+  }
+  renderDetections();
+  root.querySelectorAll('.sb-lang-btn').forEach(b => b.addEventListener('click', renderDetections));
+})();
+</script>
